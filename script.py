@@ -41,12 +41,18 @@ ccaa = ccaa.join(ccaa_deaths)
 ccaa['cases_accumulated'] = ccaa.groupby('ccaa')['num_casos'].cumsum()
 ccaa['cases_accumulated_PCR'] = ccaa.groupby('ccaa')['num_casos_prueba_pcr'].cumsum()
 ccaa['deceased_accumulated'] = ccaa.groupby('ccaa')['deceased'].cumsum()
+ccaa['deceased_per_100000'] = ccaa['deceased_accumulated'] * 100000 / ccaa['Población']
 
 # Compute rolling stats
 ccaa['cases_7_days'] = ccaa.groupby('ccaa')['num_casos'].transform(lambda x: x.rolling(7, min_periods=1).sum())
 ccaa['cases_14_days'] = ccaa.groupby('ccaa')['num_casos'].transform(lambda x: x.rolling(14, min_periods=1).sum())
+ccaa['deaths_7_days'] = ccaa.groupby('ccaa')['deceased'].transform(lambda x: x.rolling(7, min_periods=1).sum())
+ccaa['deaths_14_days'] = ccaa.groupby('ccaa')['deceased'].transform(lambda x: x.rolling(14, min_periods=1).sum())
+ccaa['deaths_7_days_1M'] = ccaa['deaths_7_days'] * 1000000 / ccaa['Población']
 ccaa['avg_cases_7_days'] = ccaa.groupby('ccaa')['num_casos'].transform(lambda x: x.rolling(7, min_periods=1).mean())
 ccaa['avg_cases_14_days'] = ccaa.groupby('ccaa')['num_casos'].transform(lambda x: x.rolling(14, min_periods=1).mean())
+ccaa['avg_deaths_3_days'] = ccaa.groupby('ccaa')['deceased'].transform(lambda x: x.rolling(3, min_periods=1).mean())
+ccaa['avg_deaths_7_days'] = ccaa.groupby('ccaa')['deceased'].transform(lambda x: x.rolling(7, min_periods=1).mean())
 
 # Compute IA
 ccaa['ia_100000_week'] = ccaa['cases_7_days'] * 100000 / ccaa['Población']
