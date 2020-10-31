@@ -22,6 +22,7 @@ A partir de ellos, en el script de Python script.py se calculan los siguiente da
 - ccaa: nombre de la Comunidad Autónoma, usando el campo ccaa_iso. Este último se elimina, ya que deja de ser útil.
 - cases_accumulated: número de casos totales detectados. Es acumulativo.
 - cases_accumulated_PCR: número de casos totales detectados por PCR. Es acumulativo.
+- cases_inc : incremento de casos respecto el día anterior. Porcentaje.
 - cases_7_days: número de casos detectados en los últimos 7 días.
 - cases_14_days: número de casos detectados en los últimos 14 días.
 - avg_cases_7_days: número de casos medio en los últimos 7 días.
@@ -33,6 +34,7 @@ A partir de ellos, en el script de Python script.py se calculan los siguiente da
 Por otra parte, utilizando los datos de fallecidos diarios en cada Cominidad Autónoma, se calculan los siguiente campos:
 - deceased_accumulated: número de fallecidos desde el inicio de la pandémia. Es acumulativo.
 - deceased_per_100000: número de fallecidos por cada 100000 habitantes.
+- deceased_inc : incremento de fallecidos respecto el día anterior. Porcentaje.
 - deaths_7_days: número de fallecidos en los últimos 7 días.
 - deaths_14_days: número de fallecidos en los últimos 14 días.
 - deaths_7_days_1M: número de fallecidos en los últimos 7 días por cada millón de habitantes.

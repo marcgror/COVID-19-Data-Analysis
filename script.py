@@ -40,8 +40,10 @@ ccaa = ccaa.join(ccaa_deaths)
 # Compute cumulative stats
 ccaa['cases_accumulated'] = ccaa.groupby('ccaa')['num_casos'].cumsum()
 ccaa['cases_accumulated_PCR'] = ccaa.groupby('ccaa')['num_casos_prueba_pcr'].cumsum()
+ccaa['cases_inc'] = ccaa.groupby('ccaa')['num_casos'].diff() / ccaa.groupby('ccaa')['num_casos'].shift() * 100
 ccaa['deceased_accumulated'] = ccaa.groupby('ccaa')['deceased'].cumsum()
 ccaa['deceased_per_100000'] = ccaa['deceased_accumulated'] * 100000 / ccaa['Población']
+ccaa['deceased_inc'] = ccaa.groupby('ccaa')['deceased'].diff() / ccaa.groupby('ccaa')['deceased'].shift() * 100
 
 # Compute rolling stats
 ccaa['cases_7_days'] = ccaa.groupby('ccaa')['num_casos'].transform(lambda x: x.rolling(7, min_periods=1).sum())
