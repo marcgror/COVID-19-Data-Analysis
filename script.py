@@ -40,26 +40,29 @@ ccaa = ccaa.join(ccaa_deaths)
 # Compute cumulative stats
 ccaa['cases_accumulated'] = ccaa.groupby('ccaa')['num_casos'].cumsum()
 ccaa['cases_accumulated_PCR'] = ccaa.groupby('ccaa')['num_casos_prueba_pcr'].cumsum()
-ccaa['cases_inc'] = ccaa.groupby('ccaa')['num_casos'].diff() / ccaa.groupby('ccaa')['num_casos'].shift() * 100
+ccaa['cases_accumulated_AC'] = ccaa.groupby('ccaa')['num_casos_prueba_test_ac'].cumsum()
+ccaa['cases_accumulated_otras'] = ccaa.groupby('ccaa')['num_casos_prueba_otras'].cumsum()
+ccaa['cases_accumulated_desconocida'] = ccaa.groupby('ccaa')['num_casos_prueba_desconocida'].cumsum()
+ccaa['cases_inc'] = round(ccaa.groupby('ccaa')['num_casos'].diff() / ccaa.groupby('ccaa')['num_casos'].shift() * 100,2)
 ccaa['deceased_accumulated'] = ccaa.groupby('ccaa')['deceased'].cumsum()
-ccaa['deceased_per_100000'] = ccaa['deceased_accumulated'] * 100000 / ccaa['Población']
-ccaa['deceased_inc'] = ccaa.groupby('ccaa')['deceased'].diff() / ccaa.groupby('ccaa')['deceased'].shift() * 100
+ccaa['deceased_per_100000'] = round(ccaa['deceased_accumulated'] * 100000 / ccaa['Población'],2)
+ccaa['deceased_inc'] = round(ccaa.groupby('ccaa')['deceased'].diff() / ccaa.groupby('ccaa')['deceased'].shift() * 100,2)
 
 # Compute rolling stats
 ccaa['cases_7_days'] = ccaa.groupby('ccaa')['num_casos'].transform(lambda x: x.rolling(7, min_periods=1).sum())
 ccaa['cases_14_days'] = ccaa.groupby('ccaa')['num_casos'].transform(lambda x: x.rolling(14, min_periods=1).sum())
 ccaa['deaths_7_days'] = ccaa.groupby('ccaa')['deceased'].transform(lambda x: x.rolling(7, min_periods=1).sum())
 ccaa['deaths_14_days'] = ccaa.groupby('ccaa')['deceased'].transform(lambda x: x.rolling(14, min_periods=1).sum())
-ccaa['deaths_7_days_1M'] = ccaa['deaths_7_days'] * 1000000 / ccaa['Población']
-ccaa['avg_cases_7_days'] = ccaa.groupby('ccaa')['num_casos'].transform(lambda x: x.rolling(7, min_periods=1).mean())
-ccaa['avg_cases_14_days'] = ccaa.groupby('ccaa')['num_casos'].transform(lambda x: x.rolling(14, min_periods=1).mean())
-ccaa['avg_deaths_3_days'] = ccaa.groupby('ccaa')['deceased'].transform(lambda x: x.rolling(3, min_periods=1).mean())
-ccaa['avg_deaths_7_days'] = ccaa.groupby('ccaa')['deceased'].transform(lambda x: x.rolling(7, min_periods=1).mean())
+ccaa['deaths_7_days_1M'] = round(ccaa['deaths_7_days'] * 1000000 / ccaa['Población'],2)
+ccaa['avg_cases_7_days'] = round(ccaa.groupby('ccaa')['num_casos'].transform(lambda x: x.rolling(7, min_periods=1).mean()),2)
+ccaa['avg_cases_14_days'] = round(ccaa.groupby('ccaa')['num_casos'].transform(lambda x: x.rolling(14, min_periods=1).mean()),2)
+ccaa['avg_deaths_3_days'] = round(ccaa.groupby('ccaa')['deceased'].transform(lambda x: x.rolling(3, min_periods=1).mean()),2)
+ccaa['avg_deaths_7_days'] = round(ccaa.groupby('ccaa')['deceased'].transform(lambda x: x.rolling(7, min_periods=1).mean()),2)
 
 # Compute IA
-ccaa['ia_100000_week'] = ccaa['cases_7_days'] * 100000 / ccaa['Población']
-ccaa['ia_100000_2week'] = ccaa['cases_14_days'] * 100000 / ccaa['Población']
-ccaa['ia_accumulated'] = ccaa['cases_accumulated'] * 100000 / ccaa['Población']
+ccaa['ia_100000_week'] = round(ccaa['cases_7_days'] * 100000 / ccaa['Población'],2)
+ccaa['ia_100000_2week'] = round(ccaa['cases_14_days'] * 100000 / ccaa['Población'],2)
+ccaa['ia_accumulated'] = round(ccaa['cases_accumulated'] * 100000 / ccaa['Población'],2)
 
 # Save national data in separated csv
 total = ccaa.reset_index().set_index('fecha')
