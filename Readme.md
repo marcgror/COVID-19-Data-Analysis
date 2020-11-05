@@ -22,6 +22,9 @@ A partir de ellos, en el script de Python script.py se calculan los siguiente da
 - ccaa: nombre de la Comunidad Autónoma, usando el campo ccaa_iso. Este último se elimina, ya que deja de ser útil.
 - cases_accumulated: número de casos totales detectados. Es acumulativo.
 - cases_accumulated_PCR: número de casos totales detectados por PCR. Es acumulativo.
+- cases_accumulated_AC: número de casos totales detectados por test de anticuerpos. Es acumulativo.
+- cases_accumulated_otras: número de casos totales detectados con otras pruebas de laboratorio. Es acumulativo.
+- cases_accumulated_desconocida: número de casos totales detectados sin información sobre la prueba de diagnóstico. Es acumulativo.
 - cases_inc : incremento de casos respecto el día anterior. Porcentaje.
 - cases_7_days: número de casos detectados en los últimos 7 días.
 - cases_14_days: número de casos detectados en los últimos 14 días.
