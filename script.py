@@ -14,13 +14,21 @@ ccaa['ccaa']=ccaa.apply(iso_to_ccaa, axis=1)
 # Drop iso code column
 ccaa = ccaa.drop('ccaa_iso', axis=1)
 # Match CCAA names
-ccaa_deaths.columns = ['Andalucía', 'Aragón', 'Asturias, Principado de', 'Illes Balears', 'Canarias', 'Cantabria', 'Castilla-La Mancha', 'Castilla y León',  
-       'Catalunya', 'Ceuta', 'Valenciana, Comunidad / Valenciana, Comunitat', 'Extremadura', 'Galicia', 'Madrid, Comunidad de', 'Melilla', 'Murcia, Región de',
-       'Navarra, Comunidad Foral de / Nafarroako Foru Komunitatea', 'País Vasco / Euskal Herria', 'La Rioja', 'España']
+ccaa_deaths.columns = ['Andalucía', 'Aragón', 'Asturias', 'Illes Balears', 'Canarias', 'Cantabria', 'Castilla-La Mancha', 'Castilla y León',  
+       'Catalunya', 'Ceuta', 'Comunitat Valenciana', 'Extremadura', 'Galicia', 'Madrid', 'Melilla', 'Murcia',
+       'Navarra', 'País Vasco', 'La Rioja', 'España']
 
 # Melt dataframe
 ccaa_deaths.index.rename('fecha', inplace=True)
 ccaa_deaths = ccaa_deaths.melt(var_name='ccaa', value_name='deceased', ignore_index=False)
+
+# Change large CCAA names
+ccaa.loc[ccaa['ccaa'] == 'Asturias, Principado de', 'ccaa'] = 'Asturias'
+ccaa.loc[ccaa['ccaa'] == 'Madrid, Comunidad de', 'ccaa'] = 'Madrid'
+ccaa.loc[ccaa['ccaa'] == 'Navarra, Comunidad Foral de / Nafarroako Foru Komunitatea', 'ccaa'] = 'Navarra'
+ccaa.loc[ccaa['ccaa'] == 'País Vasco / Euskal Herria', 'ccaa'] = 'País Vasco'
+ccaa.loc[ccaa['ccaa'] == 'Murcia, Región de', 'ccaa'] = 'Murcia'
+ccaa.loc[ccaa['ccaa'] == 'Valenciana, Comunidad / Valenciana, Comunitat', 'ccaa'] = 'Comunitat Valenciana'
 
 # Compute national stats
 total = ccaa.groupby(ccaa.index).sum()
@@ -43,6 +51,10 @@ ccaa['cases_accumulated_PCR'] = ccaa.groupby('ccaa')['num_casos_prueba_pcr'].cum
 ccaa['cases_accumulated_AC'] = ccaa.groupby('ccaa')['num_casos_prueba_test_ac'].cumsum()
 ccaa['cases_accumulated_otras'] = ccaa.groupby('ccaa')['num_casos_prueba_otras'].cumsum()
 ccaa['cases_accumulated_desconocida'] = ccaa.groupby('ccaa')['num_casos_prueba_desconocida'].cumsum()
+ccaa['cases_accumulated_PCR_percentage'] = ccaa['cases_accumulated_PCR'] * 100 / ccaa['cases_accumulated']
+ccaa['cases_accumulated_AC_percentage'] = ccaa['cases_accumulated_AC'] * 100 / ccaa['cases_accumulated']
+ccaa['cases_accumulated_otras_percentage'] = ccaa['cases_accumulated_otras'] * 100 / ccaa['cases_accumulated']
+ccaa['cases_accumulated_desconocida_percentage'] = ccaa['cases_accumulated_desconocida'] * 100 / ccaa['cases_accumulated']
 ccaa['cases_inc'] = round(ccaa.groupby('ccaa')['num_casos'].diff() / ccaa.groupby('ccaa')['num_casos'].shift() * 100,2)
 ccaa['deceased_accumulated'] = ccaa.groupby('ccaa')['deceased'].cumsum()
 ccaa['deceased_per_100000'] = round(ccaa['deceased_accumulated'] * 100000 / ccaa['Población'],2)
