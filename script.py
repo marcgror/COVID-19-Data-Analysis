@@ -4,7 +4,7 @@ import numpy as np
 import pycountry
 
 # Load data
-ccaa = pd.read_csv('https://cnecovid.isciii.es/covid19/resources/datos_ccaas.csv', index_col='fecha', parse_dates=True, dayfirst=True)
+ccaa = pd.read_csv('https://cnecovid.isciii.es/covid19/resources/casos_diagnostico_ccaa.csv', index_col='fecha', parse_dates=True, dayfirst=True)
 ccaa_poblation = pd.read_csv('población_ccaa.csv', delimiter=';')
 ccaa_deaths = pd.read_csv('https://www.mscbs.gob.es/profesionales/saludPublica/ccayes/alertasActual/nCov/documentos/Datos_Casos_COVID19.csv', header=0, keep_default_na=True, dayfirst=True, names=['ccaa_iso', 'fecha', 'casos', 'hospitalizated', 'UCI', 'deceased'], parse_dates=True, skiprows=6, delimiter=';', index_col='fecha')
 ccaa_deaths_old = pd.read_excel('https://www.mscbs.gob.es/profesionales/saludPublica/ccayes/alertasActual/nCov-China/documentos/Fallecidos_COVID19.xlsx', parse_dates=True, index_col='Fecha / CCAA', skipfooter=1)
@@ -85,11 +85,13 @@ ccaa = ccaa.join(ccaa_poblation.set_index('ccaa'), on='ccaa')
 ccaa['cases_accumulated'] = ccaa.groupby('ccaa')['num_casos'].cumsum()
 ccaa['cases_accumulated_PCR'] = ccaa.groupby('ccaa')['num_casos_prueba_pcr'].cumsum()
 ccaa['cases_accumulated_AC'] = ccaa.groupby('ccaa')['num_casos_prueba_test_ac'].cumsum()
-ccaa['cases_accumulated_otras'] = ccaa.groupby('ccaa')['num_casos_prueba_otras'].cumsum()
+ccaa['cases_accumulated_AG'] = ccaa.groupby('ccaa')['num_casos_prueba_ag'].cumsum()
+ccaa['cases_accumulated_elisa'] = ccaa.groupby('ccaa')['num_casos_prueba_elisa'].cumsum()
 ccaa['cases_accumulated_desconocida'] = ccaa.groupby('ccaa')['num_casos_prueba_desconocida'].cumsum()
 ccaa['cases_accumulated_PCR_percentage'] = ccaa['cases_accumulated_PCR'] * 100 / ccaa['cases_accumulated']
 ccaa['cases_accumulated_AC_percentage'] = ccaa['cases_accumulated_AC'] * 100 / ccaa['cases_accumulated']
-ccaa['cases_accumulated_otras_percentage'] = ccaa['cases_accumulated_otras'] * 100 / ccaa['cases_accumulated']
+ccaa['cases_accumulated_ag_percentage'] = ccaa['cases_accumulated_AG'] * 100 / ccaa['cases_accumulated']
+ccaa['cases_accumulated_elisa_percentage'] = ccaa['cases_accumulated_elisa'] * 100 / ccaa['cases_accumulated']
 ccaa['cases_accumulated_desconocida_percentage'] = ccaa['cases_accumulated_desconocida'] * 100 / ccaa['cases_accumulated']
 ccaa['cases_inc'] = round(ccaa.groupby('ccaa')['num_casos'].diff() / ccaa.groupby('ccaa')['num_casos'].shift() * 100,2)
 ccaa['deceased_accumulated'] = ccaa.groupby('ccaa')['deceased'].cumsum(skipna=False)
