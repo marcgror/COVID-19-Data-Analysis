@@ -6,41 +6,20 @@ import pycountry
 # Load data
 ccaa = pd.read_csv('https://cnecovid.isciii.es/covid19/resources/casos_diagnostico_ccaa.csv', index_col='fecha', parse_dates=True, dayfirst=True)
 ccaa_poblation = pd.read_csv('población_ccaa.csv', delimiter=';')
-ccaa_deaths = pd.read_csv('https://www.mscbs.gob.es/profesionales/saludPublica/ccayes/alertasActual/nCov/documentos/Datos_Casos_COVID19.csv', header=0, keep_default_na=True, dayfirst=True, names=['ccaa_iso', 'fecha', 'casos', 'hospitalizated', 'UCI', 'deceased'], parse_dates=True, skiprows=6, delimiter=';', index_col='fecha')
-ccaa_deaths_old = pd.read_excel('https://www.mscbs.gob.es/profesionales/saludPublica/ccayes/alertasActual/nCov-China/documentos/Fallecidos_COVID19.xlsx', parse_dates=True, index_col='Fecha / CCAA', skipfooter=1)
+ccaa_deaths = pd.read_csv('https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_datos_sanidad_nueva_serie.csv', 
+        delimiter=',', header=0, names=['fecha', 'cod-ine', 'ccaa', 'cases', 'deceased', 'hospitalizated', 'UCI'], parse_dates=True, index_col='fecha')
+ccaa_deaths = ccaa_deaths.drop(['cod-ine', 'cases'], axis=1)
 
 # Transform iso code to ccaa name
 def iso_to_ccaa(df):
     return pycountry.subdivisions.get(code=df['ccaa_iso']).name
 ccaa['ccaa_iso'] = 'ES-' + ccaa['ccaa_iso']
 ccaa['ccaa']=ccaa.apply(iso_to_ccaa, axis=1)
-ccaa_deaths['ccaa'] = ccaa_deaths.apply(iso_to_ccaa, axis=1)
 
 # Drop iso code column
 ccaa = ccaa.drop('ccaa_iso', axis=1)
-ccaa_deaths = ccaa_deaths.drop(['ccaa_iso', 'casos'], axis=1)
-
-# New dataframes
-hosp_uci = ccaa_deaths[['ccaa', 'hospitalizated', 'UCI']]
-ccaa_deaths = ccaa_deaths.drop(['hospitalizated', 'UCI'], axis=1)
-ccaa_deaths = ccaa_deaths['18-11-2020':]
 
 # Match CCAA names
-ccaa_deaths_old = ccaa_deaths_old.drop('España', 1)
-ccaa_deaths_old.columns = ['Andalucía', 'Aragón', 'Asturias', 'Illes Balears', 'Canarias', 'Cantabria', 'Castilla-La Mancha', 'Castilla y León',  
-       'Catalunya', 'Ceuta', 'Comunitat Valenciana', 'Extremadura', 'Galicia', 'Madrid', 'Melilla', 'Murcia',
-       'Navarra', 'País Vasco', 'La Rioja']
-
-# Melt dataframe
-ccaa_deaths_old.index.rename('fecha', inplace=True)
-ccaa_deaths_old = ccaa_deaths_old.melt(var_name='ccaa', value_name='deceased', ignore_index=False)
-
-# Append hospitalizated and UCI
-hosp_uci.set_index([hosp_uci.index, 'ccaa'], inplace=True)
-ccaa.set_index([ccaa.index, 'ccaa'], inplace=True)
-ccaa = ccaa.join(hosp_uci)
-
-# Change large CCAA names
 ccaa = ccaa.reset_index()
 ccaa.set_index('fecha', inplace=True)
 ccaa.loc[ccaa['ccaa'] == 'Asturias, Principado de', 'ccaa'] = 'Asturias'
@@ -49,27 +28,24 @@ ccaa.loc[ccaa['ccaa'] == 'Navarra, Comunidad Foral de / Nafarroako Foru Komunita
 ccaa.loc[ccaa['ccaa'] == 'País Vasco / Euskal Herria', 'ccaa'] = 'País Vasco'
 ccaa.loc[ccaa['ccaa'] == 'Murcia, Región de', 'ccaa'] = 'Murcia'
 ccaa.loc[ccaa['ccaa'] == 'Valenciana, Comunidad / Valenciana, Comunitat', 'ccaa'] = 'Comunitat Valenciana'
-ccaa_deaths.loc[ccaa_deaths['ccaa'] == 'Asturias, Principado de', 'ccaa'] = 'Asturias'
-ccaa_deaths.loc[ccaa_deaths['ccaa'] == 'Madrid, Comunidad de', 'ccaa'] = 'Madrid'
-ccaa_deaths.loc[ccaa_deaths['ccaa'] == 'Navarra, Comunidad Foral de / Nafarroako Foru Komunitatea', 'ccaa'] = 'Navarra'
-ccaa_deaths.loc[ccaa_deaths['ccaa'] == 'País Vasco / Euskal Herria', 'ccaa'] = 'País Vasco'
-ccaa_deaths.loc[ccaa_deaths['ccaa'] == 'Murcia, Región de', 'ccaa'] = 'Murcia'
-ccaa_deaths.loc[ccaa_deaths['ccaa'] == 'Valenciana, Comunidad / Valenciana, Comunitat', 'ccaa'] = 'Comunitat Valenciana'
-
-# New dataframe contained all deceased
-ccaa_deaths_old = ccaa_deaths_old.append(ccaa_deaths)
+ccaa_deaths.loc[ccaa_deaths['ccaa'] == 'Baleares', 'ccaa'] = 'Illes Balears'
+ccaa_deaths.loc[ccaa_deaths['ccaa'] == 'Castilla La Mancha', 'ccaa'] = 'Castilla-La Mancha'
+ccaa_deaths.loc[ccaa_deaths['ccaa'] == 'Cataluña', 'ccaa'] = 'Catalunya'
+ccaa_deaths.loc[ccaa_deaths['ccaa'] == 'C. Valenciana', 'ccaa'] = 'Comunitat Valenciana'
 
 # Set MultiIndex
-ccaa_deaths_old.set_index([ccaa_deaths_old.index, 'ccaa'], inplace=True)
+ccaa_deaths.set_index([ccaa_deaths.index, 'ccaa'], inplace=True)
 ccaa.set_index([ccaa.index, 'ccaa'], inplace=True)
 
+
 # Join deceased
-ccaa = ccaa.join(ccaa_deaths_old)
+ccaa = ccaa.join(ccaa_deaths)
 ccaa = ccaa.reset_index()
 ccaa.set_index('fecha', inplace=True)
 
 # Replace empty cells 
 ccaa.fillna(0, inplace=True)
+ccaa[['deceased', 'hospitalizated', 'UCI']] = ccaa[['deceased', 'hospitalizated', 'UCI']].astype(int)
 
 # Compute national stats
 total = ccaa.groupby(ccaa.index).sum()
@@ -80,6 +56,9 @@ ccaa = ccaa.append(total, ignore_index = False).sort_values(by=['fecha', 'ccaa']
 
 # Join poblations
 ccaa = ccaa.join(ccaa_poblation.set_index('ccaa'), on='ccaa')
+
+# Store data for tableau
+ccaa.to_csv('ccaa_tableau.csv')
 
 # Compute cumulative stats
 ccaa['cases_accumulated'] = ccaa.groupby('ccaa')['num_casos'].cumsum()
