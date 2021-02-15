@@ -4,11 +4,15 @@ import numpy as np
 import pycountry
 
 # Load data
-ccaa = pd.read_csv('https://cnecovid.isciii.es/covid19/resources/casos_diagnostico_ccaa.csv', index_col='fecha', parse_dates=True, dayfirst=True)
+ccaa = pd.read_csv('https://cnecovid.isciii.es/covid19/resources/casos_tecnica_ccaa.csv', index_col='fecha', parse_dates=True, dayfirst=True)
+print("Visual data validation:")
+print(ccaa.tail())
 ccaa_poblation = pd.read_csv('población_ccaa.csv', delimiter=';')
 ccaa_deaths = pd.read_csv('https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_datos_sanidad_nueva_serie.csv', 
         delimiter=',', header=0, names=['fecha', 'cod-ine', 'ccaa', 'cases', 'deceased', 'hospitalizated', 'UCI'], parse_dates=True, index_col='fecha')
 ccaa_deaths = ccaa_deaths.drop(['cod-ine', 'cases'], axis=1)
+print("Visual data validation:")
+print(ccaa_deaths.tail())
 
 # Transform iso code to ccaa name
 def iso_to_ccaa(df):
@@ -36,7 +40,6 @@ ccaa_deaths.loc[ccaa_deaths['ccaa'] == 'C. Valenciana', 'ccaa'] = 'Comunitat Val
 # Set MultiIndex
 ccaa_deaths.set_index([ccaa_deaths.index, 'ccaa'], inplace=True)
 ccaa.set_index([ccaa.index, 'ccaa'], inplace=True)
-
 
 # Join deceased
 ccaa = ccaa.join(ccaa_deaths)
