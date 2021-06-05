@@ -14,7 +14,7 @@ import chart_studio.tools as tls
 sns.set_style(style="darkgrid")
 from datawrapper import Datawrapper
 import streamlit as st
-from funciones import create_interactive_plot
+#from funciones import create_interactive_plot
 def write():
     st.title('Análisis de los datos del COVID-19 en España')
     st.empty()
