@@ -2,11 +2,7 @@ pandas
 numpy
 matplotlib
 seaborn
-plotly.graph_objects
-plotly.express
-plotly.subplots
+plotly
 ipywidgets
-matplotlib.dates
-chart_studio.plotly
-chart_studio.tools
+chart_studio
 Datawrapper
