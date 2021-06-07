@@ -45,7 +45,6 @@ def write():
         labels = ['PCR', 'Test AC', 'Test AG', ' Elisa', 'Desconocida']
         values = list(spain[['num_casos_prueba_pcr', 'num_casos_prueba_test_ac', 'num_casos_prueba_ag', 'num_casos_prueba_elisa', 'num_casos_prueba_desconocida']].sum())
         fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.3)], layout=dict(title='Contribución de cada método de detección', width=500))
-        py.iplot(fig, filename='Test Pie Chart')
         st.plotly_chart(fig)
 
 
